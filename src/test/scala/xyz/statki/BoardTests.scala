@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestProbe
 import org.scalatest.{Matchers, WordSpec}
 import xyz.statki.Board._
-import xyz.statki.Game.WaitingPhase
+import xyz.statki.Game.{GameOver, WaitingPhase}
 
 import scala.concurrent.duration._
 
@@ -184,6 +184,22 @@ class BoardTests extends WordSpec with Matchers {
       )
       board.tell(StateCommand(0, "Test"), probe.ref)
       probe.expectMsg(StateReply(0, "Test", expectedMap, Map.empty, WaitingPhase))
+    }
+    "report the game is over" in {
+      implicit val system = ActorSystem()
+      val probe = TestProbe()
+      val board = system.actorOf(Board.props(0, "Test", 10, Set(Ship(0, 2))))
+
+      val placement = Placement(Ship(0, 2), Position(0, 0), Down)
+      board.tell(PlaceCommand(0, "Test", placement), probe.ref)
+      probe.expectMsg(PlaceReply(0, "Test", placement, true))
+
+      board.tell(ShootCommand(0, "Test", Position(0, 0)), probe.ref)
+      probe.expectMsg(ShootReply(0, "Test", Position(0, 0), Some(HitField(Ship(0, 2)))))
+
+      board.tell(ShootCommand(0, "Test", Position(0, 1)), probe.ref)
+      probe.expectMsg(ShootReply(0, "Test", Position(0, 1), Some(SunkField(Ship(0, 2)))))
+      probe.expectMsg(PhaseNotification("Test", GameOver(0)))
     }
   }
 

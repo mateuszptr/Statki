@@ -1,7 +1,10 @@
 package xyz.statki
 
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
+import xyz.statki.Board.Ship
+import xyz.statki.Game.{GameOver, Phase, WaitingPhase}
 
 object Game {
 
@@ -39,4 +42,35 @@ object Game {
     }
   }
 
+  def props(gid: String, controller: ActorRef, dim: Int, ships: Set[Ship]): Props = Props(new Game(gid, controller, dim, ships))
+
+}
+
+class Game(gid: String, controller: ActorRef, dim: Int, ships: Set[Ship]) extends Actor with ActorLogging {
+
+  var gamePhase: Phase = WaitingPhase
+
+  var waitingForPlayers: Set[Int] = Set(0,1)
+  var placingPlayers: Set[Int] = Set.empty
+
+  val boards = Seq(
+    context.actorOf(Board.props(0,gid,dim,ships)),
+    context.actorOf(Board.props(1,gid,dim,ships))
+  )
+
+  override def receive: Receive = {
+    case PlayerUpdate(pid, `gid`) => ???
+
+    case PlaceCommand(pid, `gid`, placement) => ???
+
+    case ShootCommand(pid, `gid`, position) => ???
+
+    case PlaceReply(pid, `gid`, placement, result) => ???
+
+    case ShootReply(pid, `gid`, position, result) => ???
+
+    case PhaseNotification(`gid`, GameOver(loserPid)) => ???
+
+    case c: Command => log.warning(s"Invalid command $c. Dropping.")
+  }
 }
