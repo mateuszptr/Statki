@@ -22,6 +22,8 @@ final case class PlaceReply(pid: Int, gid: String, placement: Placement, result:
 
 final case class StateReply(pid: Int, gid: String, playerBoard: Map[Position, Field], enemyBoard: Map[Position, Field], phase: Phase) extends Command
 
+final case class PhaseNotification(gid: String, phase: Phase) extends Command
+
 
 object Command {
 
