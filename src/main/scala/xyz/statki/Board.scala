@@ -41,45 +41,6 @@ object Board {
 
   final case object MissField extends Field
 
-  trait JsonSupport extends SprayJsonSupport {
-
-    import DefaultJsonProtocol._
-
-    implicit val positionFormat = jsonFormat2(Position)
-
-    implicit val directionFormat = new RootJsonFormat[Direction] {
-      override def write(obj: Direction): JsValue = JsObject("direction" -> JsString(obj.productPrefix))
-
-      override def read(json: JsValue): Direction = json.asJsObject.getFields("direction") match {
-        case Seq(JsString("Down")) => Down
-        case Seq(JsString("Right")) => Right
-      }
-    }
-
-    implicit val shipFormat = jsonFormat2(Ship)
-
-    implicit val placementFormat = jsonFormat3(Placement)
-
-    implicit val shipFieldFormat = jsonFormat1(ShipField)
-    implicit val hitFieldFormat = jsonFormat1(HitField)
-    implicit val sunkFieldFormat = jsonFormat1(SunkField)
-
-    implicit val fieldFormat = new RootJsonFormat[Field] {
-      override def write(obj: Field): JsValue = JsObject((obj match {
-        case s: ShipField => s.toJson
-        case h: HitField => h.toJson
-        case s: SunkField => s.toJson
-        case MissField => JsObject()
-      }).asJsObject.fields + ("type" -> JsString(obj.productPrefix)))
-
-      override def read(json: JsValue): Field = json.asJsObject.getFields("type") match {
-        case Seq(JsString("ShipField")) => json.convertTo[ShipField]
-        case Seq(JsString("HitField")) => json.convertTo[HitField]
-        case Seq(JsString("SunkField")) => json.convertTo[SunkField]
-        case Seq(JsString("MissField")) => MissField
-      }
-    }
-  }
 
   def props(pid: Int, gid: String, dim: Int, initShips: Set[Ship]): Props = Props(new Board(pid, gid, dim, initShips))
 }
