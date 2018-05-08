@@ -31,6 +31,39 @@ object Command {
 
     import DefaultJsonProtocol._
 
+    implicit val playerUpdateFormat = jsonFormat2(PlayerUpdate)
+    implicit val shootCommandFormat = jsonFormat3(ShootCommand)
+    implicit val placeCommandFormat = jsonFormat3(PlaceCommand)
+    implicit val stateCommandFormat = jsonFormat2(StateCommand)
+    implicit val shootReplyFormat = jsonFormat4(ShootReply)
+    implicit val placeReplyFormat = jsonFormat4(ShootReply)
+    implicit val stateReplyFormat = jsonFormat5(StateReply)
+    implicit val phaseNotificationFormat = jsonFormat2(PhaseNotification)
+
+    implicit val commandFormat = new RootJsonFormat[Command] {
+      override def write(obj: Command): JsValue = JsObject((obj match {
+        case pu: PlayerUpdate => pu.toJson
+        case sc: ShootCommand => sc.toJson
+        case pc: PlaceCommand => pc.toJson
+        case sc: StateCommand => sc.toJson
+        case sr: ShootReply => sr.toJson
+        case pr: PlaceReply => pr.toJson
+        case sr: StateReply => sr.toJson
+        case pn: PhaseNotification => pn.toJson
+      }).asJsObject.fields + ("type" -> JsString(obj.productPrefix)))
+
+      override def read(json: JsValue): Command = json.asJsObject.getFields("type") match {
+        case Seq(JsString("PlayerUpdate")) => json.convertTo[PlayerUpdate]
+        case Seq(JsString("ShootCommand")) => json.convertTo[ShootCommand]
+        case Seq(JsString("PlaceCommand")) => json.convertTo[PlaceCommand]
+        case Seq(JsString("StateCommand")) => json.convertTo[StateCommand]
+        case Seq(JsString("ShootReply")) => json.convertTo[ShootReply]
+        case Seq(JsString("PlaceReply")) => json.convertTo[PlaceReply]
+        case Seq(JsString("StateReply")) => json.convertTo[StateReply]
+        case Seq(JsString("PhaseNotification")) => json.convertTo[PhaseNotification]
+      }
+    }
+
   }
 
 }
