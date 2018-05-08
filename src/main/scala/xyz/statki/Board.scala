@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.{JsObject, JsString, JsValue, RootJsonFormat, _}
 import xyz.statki.Board._
-import xyz.statki.Game.{GameOver, WaitingPhase}
+import xyz.statki.Game.{GameOver, Turn, WaitingPhase}
 
 import scala.collection.mutable
 
@@ -149,6 +149,8 @@ class Board(pid: Int, gid: String, dim: Int, initShips: Set[Ship]) extends Actor
     case PlaceCommand(`pid`, `gid`, placement) =>
       val result = placeShip(placement)
       sender() ! PlaceReply(pid, gid, placement, result)
+      if(shipsToPlace.isEmpty)
+        sender() ! PhaseNotification(gid, Turn(pid))
 
     case StateCommand(`pid`, `gid`) =>
       val result = state

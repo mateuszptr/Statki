@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
 import xyz.statki.Board.Ship
-import xyz.statki.Game.{GameOver, Phase, WaitingPhase}
+import xyz.statki.Game._
 
 object Game {
 
@@ -59,17 +59,79 @@ class Game(gid: String, controller: ActorRef, dim: Int, ships: Set[Ship]) extend
   )
 
   override def receive: Receive = {
-    case PlayerUpdate(pid, `gid`) => ???
+    case PlayerUpdate(pid, `gid`) if gamePhase == WaitingPhase =>
+      waitingForPlayers -= pid
+      placingPlayers += pid
+      if(waitingForPlayers.isEmpty) {
+        gamePhase = PlacementPhase
+        controller ! PhaseNotification(gid, gamePhase)
+      }
 
-    case PlaceCommand(pid, `gid`, placement) => ???
+    case PlaceCommand(pid, `gid`, placement) => gamePhase match {
+      case PlacementPhase =>
+        boards(pid) ! PlaceCommand(pid, gid, placement)
+      case _ =>
+        log.warning("Trying to place ship out of phase")
+    }
 
-    case ShootCommand(pid, `gid`, position) => ???
+    case ShootCommand(pid, `gid`, position)=> gamePhase match {
+      case Turn(`pid`) => boards(1-pid) ! ShootCommand(1-pid,gid,position)
+      case Turn(_) => log.warning("Trying to shoot out of turn")
+      case _ => log.warning("Trying to shoot out of phase")
+    }
 
-    case PlaceReply(pid, `gid`, placement, result) => ???
+    case pr@PlaceReply(pid, `gid`, placement, result) => gamePhase match {
+      case PlacementPhase =>
+        controller ! pr
+      case _ =>
+        log.error(s"Got $pr out of phase")
+    }
 
-    case ShootReply(pid, `gid`, position, result) => ???
+    case sr@ShootReply(pid, `gid`, position, result) =>
+      val shooterPid = 1-pid
+      gamePhase match {
+      case Turn(`shooterPid`) =>
+        controller ! ShootReply(shooterPid, gid, position, result)
+        result match {
+          case Some(_) =>
+            gamePhase = Turn(pid)
+            controller ! PhaseNotification(gid, gamePhase)
+          case None => log.warning("Invalid shot")
+        }
+      case Turn(_) =>
+        log.error(s"Got $sr out of turn")
+      case _ =>
+        log.error(s"Got $sr out of phase")
+    }
 
-    case PhaseNotification(`gid`, GameOver(loserPid)) => ???
+    case pn@PhaseNotification(`gid`, Turn(pid)) => gamePhase match {
+      case PlacementPhase =>
+        placingPlayers -= pid
+        if(placingPlayers.isEmpty) {
+          gamePhase = Turn(0)
+          controller ! PhaseNotification(gid, gamePhase)
+        }
+      case _ =>
+        log.error(s"Got $pn out of phase")
+    }
+
+    case pn@ PhaseNotification(`gid`, GameOver(loserPid)) => gamePhase match {
+      case Turn(`loserPid`) =>
+        controller ! pn
+        context.stop(self)
+
+      case Turn(_) =>
+        log.error(s"Got $pn out of turn")
+
+      case _ =>
+        log.error(s"Got $pn out of phase")
+    }
+
+    case StateCommand(pid, `gid`) =>
+      val query = context.actorOf(GameStateQuery.props(pid, gid, self, boards))
+
+    case StateReply(pid, `gid`, playerBoard, enemyBoard, _) =>
+      controller ! StateReply(pid, gid, playerBoard, enemyBoard, gamePhase)
 
     case c: Command => log.warning(s"Invalid command $c. Dropping.")
   }

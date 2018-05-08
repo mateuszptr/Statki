@@ -64,6 +64,7 @@ class GameTests extends WordSpec with Matchers {
       game.tell(PlaceCommand(1, "Test", placement), probe.ref)
       probe.expectMsg(PlaceReply(1, "Test", placement, true))
       probe.expectMsg(PhaseNotification("Test", Turn(0)))
+
     }
     "hit and sink ships" in {
       implicit val system = ActorSystem()

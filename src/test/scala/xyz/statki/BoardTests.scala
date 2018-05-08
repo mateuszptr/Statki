@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestProbe
 import org.scalatest.{Matchers, WordSpec}
 import xyz.statki.Board._
-import xyz.statki.Game.{GameOver, WaitingPhase}
+import xyz.statki.Game.{GameOver, Turn, WaitingPhase}
 
 import scala.concurrent.duration._
 
@@ -42,6 +42,7 @@ class BoardTests extends WordSpec with Matchers {
 
       board.tell(PlaceCommand(0, "Test", placement1), probe.ref)
       probe.expectMsg(PlaceReply(0, "Test", placement1, true))
+      probe.expectMsg(PhaseNotification("Test", Turn(0)))
 
       board.tell(PlaceCommand(0, "Test", placement2), probe.ref)
       probe.expectMsg(PlaceReply(0, "Test", placement2, false))
@@ -193,6 +194,7 @@ class BoardTests extends WordSpec with Matchers {
       val placement = Placement(Ship(0, 2), Position(0, 0), Down)
       board.tell(PlaceCommand(0, "Test", placement), probe.ref)
       probe.expectMsg(PlaceReply(0, "Test", placement, true))
+      probe.expectMsg(PhaseNotification("Test", Turn(0)))
 
       board.tell(ShootCommand(0, "Test", Position(0, 0)), probe.ref)
       probe.expectMsg(ShootReply(0, "Test", Position(0, 0), Some(HitField(Ship(0, 2)))))
