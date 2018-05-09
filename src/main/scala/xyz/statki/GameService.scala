@@ -6,14 +6,15 @@ import akka.http.scaladsl.server.Directives
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
 import akka.stream.scaladsl.{Flow, GraphDSL, Merge, Sink, Source}
 import spray.json._
+import xyz.statki.Board.Ship
 
-class GameService(implicit val actorSystem: ActorSystem, implicit val actorMaterializer: ActorMaterializer) extends Directives with JsonSupport {
+class GameService(implicit val actorSystem: ActorSystem, implicit val actorMaterializer: ActorMaterializer, implicit val dim: Int, implicit val ships: Set[Ship]) extends Directives with JsonSupport {
 
   val wsRoute = (get & parameters('pid.as[Int], 'gid)) { (pid, gid) =>
     handleWebSocketMessages(flow(pid, gid))
   }
 
-  val gameControllerActor = actorSystem.actorOf(GameController.props())
+  val gameControllerActor = actorSystem.actorOf(GameController.props(dim, ships))
   val playerActorSource = Source.actorRef[Command](5, OverflowStrategy.fail)
 
   def flow(pid: Int, gid: String): Flow[Message, Message, Any] = Flow.fromGraph(GraphDSL.create(playerActorSource){ implicit builder => actorSrc =>
