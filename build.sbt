@@ -1,6 +1,13 @@
 lazy val akkaHttpVersion = "10.1.1"
 lazy val akkaVersion = "2.5.12"
 
+lazy val circeVersion = "0.10.0-M1"
+
+addCompilerPlugin(
+  "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
+)
+
+
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
@@ -18,5 +25,10 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.0.1" % Test
-    )
+    ),
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % circeVersion)
   )

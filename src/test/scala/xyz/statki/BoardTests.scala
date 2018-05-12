@@ -5,6 +5,7 @@ import akka.testkit.TestProbe
 import org.scalatest.{Matchers, WordSpec}
 import xyz.statki.Board._
 import xyz.statki.Game.{GameOver, Turn, WaitingPhase}
+import xyz.statki.Protocol._
 
 import scala.concurrent.duration._
 

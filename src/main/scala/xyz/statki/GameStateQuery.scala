@@ -3,6 +3,7 @@ package xyz.statki
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import xyz.statki.Board.{Field, Position, ShipField}
 import xyz.statki.Game.WaitingPhase
+import xyz.statki.Protocol._
 
 class GameStateQuery(pid: Int, gid: String, gameActor: ActorRef, boards: Seq[ActorRef]) extends Actor with ActorLogging {
 

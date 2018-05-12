@@ -2,36 +2,42 @@ package xyz.statki
 
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import io.circe._
+import io.circe.generic.JsonCodec
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 import spray.json.{JsObject, JsString, JsValue, RootJsonFormat, _}
 import xyz.statki.Board._
 import xyz.statki.Game.{GameOver, Turn, WaitingPhase}
+import xyz.statki.Protocol._
 
 import scala.collection.mutable
 
 object Board {
 
-  final case class Position(x: Int, y: Int) {
+  @JsonCodec final case class Position(x: Int, y: Int) {
     def +(other: Position) = Position(x + other.x, y + other.y)
 
     def valid(dim: Int): Boolean = x >= 0 && x < dim && y >= 0 && y < dim
   }
 
-  sealed trait Direction extends Product
+  @JsonCodec sealed trait Direction extends Product
 
   final case object Down extends Direction
 
   final case object Right extends Direction
 
-  final case class Ship(id: Int, len: Int)
+  @JsonCodec final case class Ship(id: Int, len: Int)
 
-  final case class Placement(ship: Ship, position: Position, direction: Direction) {
+  @JsonCodec final case class Placement(ship: Ship, position: Position, direction: Direction) {
     def positions: Seq[Position] = for (i <- 0 until ship.len) yield direction match {
       case Down => position + Position(0, i)
       case Right => position + Position(i, 0)
     }
   }
 
-  sealed trait Field extends Product
+  @JsonCodec sealed trait Field extends Product
 
   final case class ShipField(ship: Ship) extends Field
 

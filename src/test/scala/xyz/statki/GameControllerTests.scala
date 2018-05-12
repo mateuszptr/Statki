@@ -5,6 +5,7 @@ import akka.testkit.TestProbe
 import org.scalatest.{Matchers, WordSpec}
 import xyz.statki.Board._
 import xyz.statki.Game.{GameOver, PlacementPhase, Turn}
+import xyz.statki.Protocol._
 
 class GameControllerTests extends WordSpec with Matchers {
   "GameController" should {

@@ -5,7 +5,7 @@ import akka.testkit.TestProbe
 import org.scalatest.{Matchers, WordSpec}
 import xyz.statki.Board._
 import xyz.statki.Game.{GameOver, PlacementPhase, Turn}
-
+import xyz.statki.Protocol._
 import scala.concurrent.duration._
 
 class GameTests extends WordSpec with Matchers {

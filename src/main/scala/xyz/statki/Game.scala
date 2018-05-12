@@ -1,12 +1,19 @@
 package xyz.statki
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import io.circe._
+import io.circe.generic.JsonCodec
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 import xyz.statki.Board.Ship
 import xyz.statki.Game._
+import xyz.statki.Protocol._
+
 
 object Game {
 
-  sealed trait Phase extends Product
+  @JsonCodec sealed trait Phase extends Product
 
   final case object WaitingPhase extends Phase
 
