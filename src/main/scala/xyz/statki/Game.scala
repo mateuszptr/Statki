@@ -6,22 +6,13 @@ import io.circe.generic.JsonCodec
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
-import xyz.statki.Board.Ship
 import xyz.statki.Game._
 import xyz.statki.Protocol._
 
 
 object Game {
 
-  @JsonCodec sealed trait Phase extends Product
 
-  final case object WaitingPhase extends Phase
-
-  final case object PlacementPhase extends Phase
-
-  final case class Turn(pid: Int) extends Phase
-
-  final case class GameOver(loserPid: Int) extends Phase
 
   def props(gid: String, controller: ActorRef, dim: Int, ships: Set[Ship]): Props = Props(new Game(gid, controller, dim, ships))
 

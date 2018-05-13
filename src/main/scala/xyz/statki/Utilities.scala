@@ -1,6 +1,5 @@
 package xyz.statki
 
-import xyz.statki.Board.{Down, Placement, Position, Ship}
 import xyz.statki.Protocol._
 import io.circe._, io.circe.parser._, io.circe.syntax._
 

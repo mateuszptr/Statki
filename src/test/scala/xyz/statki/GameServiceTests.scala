@@ -5,7 +5,6 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 //import spray.json._
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import xyz.statki.Board._
-import xyz.statki.Game.{GameOver, PlacementPhase, Turn}
 import xyz.statki.Protocol._
 
 class GameServiceTests extends WordSpec with Matchers with ScalatestRouteTest with BeforeAndAfterAll {

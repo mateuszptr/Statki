@@ -1,7 +1,6 @@
 package xyz.statki
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, Terminated}
-import xyz.statki.Board.Ship
 import xyz.statki.Protocol._
 
 import scala.collection.mutable

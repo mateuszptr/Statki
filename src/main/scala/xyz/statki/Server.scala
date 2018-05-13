@@ -3,7 +3,7 @@ package xyz.statki
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import xyz.statki.Board.Ship
+import xyz.statki.Protocol._
 
 import scala.io.StdIn
 
