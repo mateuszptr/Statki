@@ -1,6 +1,6 @@
 package xyz.statki
 
-import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import akka.actor._
 import xyz.statki.Protocol._
 
 object Game {
