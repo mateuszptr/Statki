@@ -1,20 +1,8 @@
 package xyz.statki
 
-import akka.actor.ActorRef
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import io.circe.Decoder.Result
 import io.circe._
 import io.circe.generic.JsonCodec
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
-import io.circe._
-import io.circe.generic.semiauto._
-import xyz.statki.Board._
-import xyz.statki.Game._
-import spray.json._
-
-
 
 object Protocol {
 
@@ -60,7 +48,7 @@ object Protocol {
   final case class GameOver(loserPid: Int) extends Phase
 
   object AsInt {
-    def unapply(s: String) = try{ Some(s.toInt) } catch {
+    def unapply(s: String) = try { Some(s.toInt) } catch {
       case e: NumberFormatException => None
     }
   }
@@ -83,12 +71,12 @@ object Protocol {
     }
   }
 
-  implicit val actorRefDecoder = new Decoder[ActorRef] {
-    override def apply(c: HCursor): Result[ActorRef] = Left(DecodingFailure("Not implemented", c.history))
+  implicit val actorRefDecoder = new Decoder[Any] {
+    override def apply(c: HCursor): Result[Any] = Left(DecodingFailure("Not implemented", c.history))
   }
 
-  implicit val actorRefEncoder = new Encoder[ActorRef] {
-    override def apply(a: ActorRef): Json = ???
+  implicit val actorRefEncoder = new Encoder[Any] {
+    override def apply(a: Any): Json = ???
   }
 
   @JsonCodec sealed trait Command
@@ -105,11 +93,11 @@ object Protocol {
 
   final case class PlaceReply(pid: Int, gid: String, placement: Placement, result: Boolean) extends Command
 
-  final case class StateReply(pid: Int, gid: String, playerBoard: Map[Position, Field], enemyBoard: Map[Position, Field], phase: Phase)  extends Command
+  final case class StateReply(pid: Int, gid: String, playerBoard: Map[Position, Field], enemyBoard: Map[Position, Field], phase: Phase) extends Command
 
   final case class PhaseNotification(gid: String, phase: Phase) extends Command
 
-  final case class PlayerConnected(pid: Int, gid: String, actorRef: ActorRef) extends Command
+  final case class PlayerConnected(pid: Int, gid: String, actorRef: Any) extends Command
 
   final case class PlayerDisconnected(pid: Int, gid: String) extends Command
 }

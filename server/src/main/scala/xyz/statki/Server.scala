@@ -15,18 +15,16 @@ object Server {
 
     implicit val dim = 10
     implicit val ships = Set(
-      Ship(0,2),
-      Ship(1,3),
-      Ship(2,3),
-      Ship(3,4),
-      Ship(4,5)
+      Ship(0, 2),
+      Ship(1, 3),
+      Ship(2, 3),
+      Ship(3, 4),
+      Ship(4, 5)
     )
 
     val gameService = new GameService()
     val bindingFuture = Http().bindAndHandle(gameService.wsRoute, "localhost", 9999)
     println("Server running..")
-
-
 
     StdIn.readLine()
     bindingFuture

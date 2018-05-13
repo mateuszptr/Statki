@@ -2,8 +2,7 @@ package xyz.statki
 
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
-import org.scalatest.{Matchers, WordSpec}
-import xyz.statki.Board._
+import org.scalatest.{ Matchers, WordSpec }
 import xyz.statki.Protocol._
 
 import scala.concurrent.duration._
@@ -160,8 +159,8 @@ class BoardTests extends WordSpec with Matchers {
       probe.expectMsg(PlaceReply(0, "Test", placement, true))
 
       var expectedMap: Map[Position, Field] = Map(
-        Position(0,0) -> ShipField(Ship(0,2)),
-        Position(0,1) -> ShipField(Ship(0,2))
+        Position(0, 0) -> ShipField(Ship(0, 2)),
+        Position(0, 1) -> ShipField(Ship(0, 2))
       )
       board.tell(StateCommand(0, "Test"), probe.ref)
       probe.expectMsg(StateReply(0, "Test", expectedMap, Map.empty, WaitingPhase))
@@ -170,8 +169,8 @@ class BoardTests extends WordSpec with Matchers {
       probe.expectMsg(ShootReply(0, "Test", Position(0, 0), Some(HitField(Ship(0, 2)))))
 
       expectedMap = Map(
-        Position(0,0) -> HitField(Ship(0,2)),
-        Position(0,1) -> ShipField(Ship(0,2))
+        Position(0, 0) -> HitField(Ship(0, 2)),
+        Position(0, 1) -> ShipField(Ship(0, 2))
       )
       board.tell(StateCommand(0, "Test"), probe.ref)
       probe.expectMsg(StateReply(0, "Test", expectedMap, Map.empty, WaitingPhase))
@@ -180,8 +179,8 @@ class BoardTests extends WordSpec with Matchers {
       probe.expectMsg(ShootReply(0, "Test", Position(0, 1), Some(SunkField(Ship(0, 2)))))
 
       expectedMap = Map(
-        Position(0,0) -> SunkField(Ship(0,2)),
-        Position(0,1) -> SunkField(Ship(0,2))
+        Position(0, 0) -> SunkField(Ship(0, 2)),
+        Position(0, 1) -> SunkField(Ship(0, 2))
       )
       board.tell(StateCommand(0, "Test"), probe.ref)
       probe.expectMsg(StateReply(0, "Test", expectedMap, Map.empty, WaitingPhase))
