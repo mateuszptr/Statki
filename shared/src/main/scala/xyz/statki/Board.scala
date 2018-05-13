@@ -1,6 +1,6 @@
 package xyz.statki
 
-import akka.actor.{ Actor, ActorLogging, Props }
+import akka.actor._
 import xyz.statki.Protocol._
 
 import scala.collection.mutable
