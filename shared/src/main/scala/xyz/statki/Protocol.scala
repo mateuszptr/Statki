@@ -8,6 +8,7 @@ object Protocol {
 
   @JsonCodec final case class Position(x: Int, y: Int) {
     def +(other: Position) = Position(x + other.x, y + other.y)
+    def *(scale: Int) = Position(x*scale, y*scale)
 
     def valid(dim: Int): Boolean = x >= 0 && x < dim && y >= 0 && y < dim
   }
