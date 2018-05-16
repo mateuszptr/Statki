@@ -18,10 +18,12 @@ class InputOutputHandler(pid: Int, gid: String, canvas: dom.html.Canvas, addr: S
   var direction: Protocol.Direction = Protocol.Down
 
   def handleKeyboard(): Unit = {
-    dom.document.onkeypress = { event =>
+    dom.document.onkeydown = { event =>
+      //println("Pressed a key")
       event.keyCode match {
         case 39 => direction = Protocol.Right
         case 40 => direction = Protocol.Down
+        case _ =>
       }
     }
   }
@@ -39,13 +41,12 @@ class InputOutputHandler(pid: Int, gid: String, canvas: dom.html.Canvas, addr: S
     }
   }
 
-  def handleUserInput(): Unit = {
+  def handleMouse(): Unit = {
     canvas.onclick = { event =>
       val rect = canvas.getBoundingClientRect()
       val x = (event.clientX - rect.left) / (rect.right - rect.left) * canvas.width
       val y = (event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
       handleClick(x.toInt, y.toInt)
-      handleKeyboard()
     }
   }
 
@@ -54,7 +55,8 @@ class InputOutputHandler(pid: Int, gid: String, canvas: dom.html.Canvas, addr: S
   override def preStart(): Unit = {
 
     webSocket.onopen = { event =>
-      handleUserInput()
+      handleMouse()
+      handleKeyboard()
       clientActor ! "SocketReady"
       context.become(recvCommands)
     }

@@ -1,10 +1,12 @@
 package xyz.statki
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.settings.ServerSettings
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import xyz.statki.Protocol._
 
+import scala.concurrent.duration._
 import scala.io.StdIn
 
 object Server {
@@ -22,8 +24,12 @@ object Server {
       Ship(4, 5)
     )
 
+    val defaultSettings = ServerSettings(system)
+    val wsSettings = defaultSettings.websocketSettings.withPeriodicKeepAliveMaxIdle(1.second)
+    val customSettings = defaultSettings.withWebsocketSettings(wsSettings)
+
     val gameService = new GameService()
-    val bindingFuture = Http().bindAndHandle(gameService.wsRoute, "localhost", 9999)
+    val bindingFuture = Http().bindAndHandle(gameService.wsRoute, "localhost", 9999, settings = customSettings)
     println("Server running..")
 
     StdIn.readLine()
